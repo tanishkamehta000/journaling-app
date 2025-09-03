@@ -1,50 +1,47 @@
-# Welcome to your Expo app 👋
+# Journaling App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is a journaling app built with Reactive Native + Expo. It includes
+- User authentication (Firebase email/password authentication)
+- User journal entries stored in Firestore
+- Persistent login across app restarts
 
-## Get started
+# Features
+- Sign-up/Sign-in with Firebase Authentication
+- Add journal entries
+- Entries are saved per user (and persist even when logging out/in)
+- iOS keyboard handling
 
-1. Install dependencies
 
-   ```bash
-   npm install
-   ```
+# How to Run
 
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+## Clone the repo
 ```bash
-npm run reset-project
+git clone https://github.com/tanishkamehta000/journaling-app.git
+cd journaling-app
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Install dependencies
+```bash
+npm install
+```
 
-## Learn more
+## Run the app
+Start Metro bundler:
+```bash
+npx expo start --lan
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+Scan the QR code in Expo Go on a phone.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+# Note:
+This app is already connected to a shared Firebase project (`journaling-app-65a3c`). No additional setup is required. When cloning and running the app, it will use this backend automatically.
 
-## Join the community
 
-Join our community of developers creating universal apps.
+## Requirements Demonstrated
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- Dev environment: Expo (React Native)
+- Runs on physical device via Expo Go
+- Code checked into GitHub (tanishkamehta000)
+- Partner can clone, build, and deploy
+- Backend: Firebase (Authentication + Firestore Database)
+- Exceptional work: per-user authentication & storage, UI changes with screen flow (sign up/in --> journal)
