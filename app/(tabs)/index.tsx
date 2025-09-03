@@ -1,83 +1,184 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useEffect, useState } from "react";
-import { Alert, Button, FlatList, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  User,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  orderBy,
+  query,
+} from "firebase/firestore";
+import { JSX, useEffect, useState } from "react";
+import {
+  Alert,
+  Button,
+  FlatList,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+
+import { auth, db } from "@/lib/firebase";
 
 type Entry = { id: string; text: string };
 
-const STORAGE_KEY = "JOURNAL_ENTRIES_V1";
-
-export default function Index() {
-  const [entry, setEntry] = useState<string>("");
+export default function Index(): JSX.Element {
+  const [email, setEmail] = useState("");
+  const [pw, setPw] = useState("");
+  const [entry, setEntry] = useState("");
   const [entries, setEntries] = useState<Entry[]>([]);
+  const [user, setUser] = useState<User | null>(null);
 
-  // load saved entries
   useEffect(() => {
-    const load = async () => {
-      try {
-        const raw = await AsyncStorage.getItem(STORAGE_KEY);
-        if (raw) setEntries(JSON.parse(raw));
-      } catch {
-        Alert.alert("Error", "Could not load past entries.");
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      if (u) {
+        loadEntries(u.uid);
+      } else {
+        setEntries([]);
       }
-    };
-    load();
+    });
+    return unsub;
   }, []);
 
-  // save
-  useEffect(() => {
-    const save = async () => {
-      try {
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-      } catch {
-        Alert.alert("Error", "Could not save entries.");
-      }
-    };
-    save();
-  }, [entries]);
+  const loadEntries = async (uid: string) => {
+    try {
+      const q = query(
+        collection(db, "users", uid, "entries"),
+        orderBy("createdAt", "desc")
+      );
+      const snap = await getDocs(q);
+      const list: Entry[] = snap.docs.map((d) => ({
+        id: d.id,
+        text: d.data().text,
+      }));
+      setEntries(list);
+    } catch (err: any) {
+      console.log("LOAD error", err.message);
+    }
+  };
 
-  const addEntry = () => {
+  const addEntry = async () => {
+    if (!user) return;
     const text = entry.trim();
     if (!text) return;
-    setEntries((prev) => [{ id: Date.now().toString(), text }, ...prev]);
-    setEntry("");
+    try {
+      await addDoc(collection(db, "users", user.uid, "entries"), {
+        text,
+        createdAt: new Date(),
+      });
+      setEntry("");
+      loadEntries(user.uid);
+    } catch (err: any) {
+      Alert.alert("Error", err.message);
+    }
+  };
+
+  const handleSignUp = async () => {
+    try {
+      await createUserWithEmailAndPassword(auth, email, pw);
+      Alert.alert("Signed up", "Account created");
+    } catch (err: any) {
+      Alert.alert("Sign up failed", err.message);
+    }
+  };
+
+  const handleSignIn = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, pw);
+      Alert.alert("Signed in", "Welcome back");
+    } catch (err: any) {
+      Alert.alert("Sign in failed", err.message);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (err: any) {
+      Alert.alert("Sign out failed", err.message);
+    }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>My Journal</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <View style={styles.container}>
+        {!user ? (
+          <>
+            <Text style={styles.title}>Firebase Auth</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              secureTextEntry
+              value={pw}
+              onChangeText={setPw}
+            />
+            <Button title="Sign Up" onPress={handleSignUp} />
+            <Button title="Sign In" onPress={handleSignIn} />
+          </>
+        ) : (
+          <>
+            <Text style={styles.title}>Welcome, {user.email}</Text>
+            <Button title="Sign Out" onPress={handleSignOut} />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Write something..."
-        value={entry}
-        onChangeText={setEntry}
-        multiline
-      />
+            <TextInput
+              style={styles.input}
+              placeholder="Write something..."
+              value={entry}
+              onChangeText={setEntry}
+              multiline
+            />
+            <Button title="Add Entry" onPress={addEntry} />
 
-      <Button title="Add Entry" onPress={addEntry} />
-
-      <FlatList
-        style={styles.list}
-        data={entries}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <Text style={styles.entry}>{item.text}</Text>}
-        ListEmptyComponent={<Text style={{ color: "#666" }}>No entries yet</Text>}
-      />
-    </View>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+              <FlatList
+                style={styles.list}
+                data={entries}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <Text style={styles.entry}>{item.text}</Text>
+                )}
+                ListEmptyComponent={
+                  <Text style={{ color: "#666" }}>No entries yet</Text>
+                }
+                keyboardShouldPersistTaps="handled"
+              />
+            </TouchableWithoutFeedback>
+          </>
+        )}
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 20, paddingTop: 50 },
-  title: { fontSize: 24, fontWeight: "600", marginBottom: 12 },
+  container: { flex: 1, padding: 20, paddingTop: 50 },
+  title: { fontSize: 22, fontWeight: "600", marginBottom: 12 },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
     padding: 12,
     borderRadius: 8,
-    minHeight: 80,
     marginBottom: 12,
-    textAlignVertical: "top",
   },
   list: { marginTop: 8 },
   entry: {
@@ -85,6 +186,5 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: "#e5e5e5",
     fontSize: 16,
-    lineHeight: 22,
   },
 });
