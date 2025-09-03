@@ -172,7 +172,7 @@ export default function Index(): JSX.Element {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, paddingTop: 100 },
-  title: { fontSize: 22, fontWeight: "600", marginBottom: 10 },
+  title: { fontSize: 22, marginBottom: 10 },
   input: {
     borderWidth: 1,
     padding: 15,
