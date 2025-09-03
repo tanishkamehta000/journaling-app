@@ -1,75 +1,90 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useEffect, useState } from "react";
+import { Alert, Button, FlatList, StyleSheet, Text, TextInput, View } from "react-native";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+type Entry = { id: string; text: string };
 
-export default function HomeScreen() {
+const STORAGE_KEY = "JOURNAL_ENTRIES_V1";
+
+export default function Index() {
+  const [entry, setEntry] = useState<string>("");
+  const [entries, setEntries] = useState<Entry[]>([]);
+
+  // load saved entries
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const raw = await AsyncStorage.getItem(STORAGE_KEY);
+        if (raw) setEntries(JSON.parse(raw));
+      } catch {
+        Alert.alert("Error", "Could not load past entries.");
+      }
+    };
+    load();
+  }, []);
+
+  // save
+  useEffect(() => {
+    const save = async () => {
+      try {
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+      } catch {
+        Alert.alert("Error", "Could not save entries.");
+      }
+    };
+    save();
+  }, [entries]);
+
+  const addEntry = () => {
+    const text = entry.trim();
+    if (!text) return;
+    setEntries((prev) => [{ id: Date.now().toString(), text }, ...prev]);
+    setEntry("");
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+      <Text style={styles.title}>My Journal</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Write something..."
+        value={entry}
+        onChangeText={setEntry}
+        multiline
+      />
+
+      <Button title="Add Entry" onPress={addEntry} />
+
+      <FlatList
+        style={styles.list}
+        data={entries}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <Text style={styles.entry}>{item.text}</Text>}
+        ListEmptyComponent={<Text style={{ color: "#666" }}>No entries yet</Text>}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: { flex: 1, backgroundColor: "#fff", padding: 20, paddingTop: 50 },
+  title: { fontSize: 24, fontWeight: "600", marginBottom: 12 },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 12,
+    borderRadius: 8,
+    minHeight: 80,
+    marginBottom: 12,
+    textAlignVertical: "top",
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  list: { marginTop: 8 },
+  entry: {
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: "#e5e5e5",
+    fontSize: 16,
+    lineHeight: 22,
   },
 });
