@@ -171,20 +171,18 @@ export default function Index(): JSX.Element {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, paddingTop: 50 },
-  title: { fontSize: 22, fontWeight: "600", marginBottom: 12 },
+  container: { flex: 1, padding: 20, paddingTop: 100 },
+  title: { fontSize: 22, fontWeight: "600", marginBottom: 10 },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
   },
-  list: { marginTop: 8 },
+  list: { marginTop: 10 },
   entry: {
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#e5e5e5",
-    fontSize: 16,
+    paddingVertical: 10,
+    borderBottomWidth: 5,
+    fontSize: 15,
   },
 });
