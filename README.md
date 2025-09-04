@@ -44,4 +44,4 @@ This app is already connected to a shared Firebase project (`journaling-app-65a3
 - Code checked into GitHub (tanishkamehta000)
 - Partner can clone, build, and deploy
 - Backend: Firebase (Authentication + Firestore Database)
-- Exceptional work: per-user authentication & storage, UI changes with screen flow (sign up/in --> journal)
+- Exceptional work: per-user authentication & storage, UI changes with screen flow (sign up/in --> journal), and alerts (sign-in/account creation errors, welcome message)
