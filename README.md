@@ -34,7 +34,8 @@ npx expo start --lan
 Scan the QR code in Expo Go on a phone.
 
 # Note:
-This app is already connected to a shared Firebase project (`journaling-app-65a3c`). No additional setup is required. When cloning and running the app, it will use this backend automatically.
+- Use in light-mode to have features shown properly.
+- This app is already connected to a shared Firebase project (`journaling-app-65a3c`). No additional setup is required. When cloning and running the app, it will use this backend automatically.
 
 
 ## Requirements Demonstrated
