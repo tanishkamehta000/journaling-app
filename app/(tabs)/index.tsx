@@ -170,7 +170,6 @@ export default function Index(): JSX.Element {
     </KeyboardAvoidingView>
   );
 }
-//--Last Change: Just added some height between the sign up and sign in button
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, paddingTop: 100 },
@@ -179,14 +178,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 15,
     borderRadius: 10,
-    marginBottom: 10,
-    color: 'white'
+    marginBottom: 10
   },
   list: { marginTop: 10 },
   entry: {
     paddingVertical: 10,
     borderBottomWidth: 5,
-    fontSize: 15,
-    color: 'white'
+    fontSize: 15
   },
 });
