@@ -1,3 +1,4 @@
+
 import {
   User,
   createUserWithEmailAndPassword,
@@ -133,6 +134,7 @@ export default function Index(): JSX.Element {
               onChangeText={setPw}
             />
             <Button title="Sign Up" onPress={handleSignUp} />
+            <View style={{ height: 10 }} />
             <Button title="Sign In" onPress={handleSignIn} />
           </>
         ) : (
@@ -148,7 +150,6 @@ export default function Index(): JSX.Element {
               multiline
             />
             <Button title="Add Entry" onPress={addEntry} />
-
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
               <FlatList
                 style={styles.list}
@@ -169,6 +170,7 @@ export default function Index(): JSX.Element {
     </KeyboardAvoidingView>
   );
 }
+//--Last Change: Just added some height between the sign up and sign in button
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, paddingTop: 100 },
