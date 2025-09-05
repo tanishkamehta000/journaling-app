@@ -118,7 +118,7 @@ export default function Index(): JSX.Element {
       <View style={styles.container}>
         {!user ? (
           <>
-            <Text style={styles.title}>Firebase Auth</Text>
+            <Text style={styles.title}>Sign In to Continue</Text>
             <TextInput
               style={styles.input}
               placeholder="Email"
@@ -144,7 +144,7 @@ export default function Index(): JSX.Element {
 
             <TextInput
               style={styles.input}
-              placeholder="Write something..."
+              placeholder="Hey there! What's on your mind today?"
               value={entry}
               onChangeText={setEntry}
               multiline
@@ -180,11 +180,13 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
+    color: 'white'
   },
   list: { marginTop: 10 },
   entry: {
     paddingVertical: 10,
     borderBottomWidth: 5,
     fontSize: 15,
+    color: 'white'
   },
 });
